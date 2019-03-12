@@ -18,21 +18,6 @@
  *  Data Transfer Object. Object containing fields only.
  *  Used in API for serialization/deserialization and validation
  */
-class HelloDto : public oatpp::data::mapping::type::Object
-{
-  DTO_INIT(HelloDto, Object)
-
-  DTO_FIELD(String, userAgent, "user-agent");
-  DTO_FIELD(String, message);
-  DTO_FIELD(String, server);
-};
-
-class MessageDto : public oatpp::data::mapping::type::Object
-{
-  DTO_INIT(MessageDto, Object)
-
-  DTO_FIELD(String, message);
-};
 
 class GBSDto : public oatpp::data::mapping::type::Object
 {
