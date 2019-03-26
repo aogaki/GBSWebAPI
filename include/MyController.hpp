@@ -41,7 +41,6 @@ class MyController : public oatpp::web::server::api::ApiController
   MyController(const std::shared_ptr<ObjectMapper> &objectMapper)
       : oatpp::web::server::api::ApiController(objectMapper)
   {
-    Test();
   }
 
  private:
@@ -51,8 +50,6 @@ class MyController : public oatpp::web::server::api::ApiController
 
   // OATPP_COMPONENT(std::shared_ptr<TDatabase>, fDatabase);
   // OATPP_COMPONENT(std::shared_ptr<TDBHandler>, fDatabase);
-
-  static void Test();
 
  public:
   /**
@@ -64,8 +61,6 @@ class MyController : public oatpp::web::server::api::ApiController
   {
     return std::shared_ptr<MyController>(new MyController(objectMapper));
   }
-
-  typedef MyController __ControllerType;
 
   /**
    *  Begin ENDPOINTs generation ('ApiController' codegen)
@@ -167,7 +162,6 @@ for (auto doc : cursor) {
 }
 auto response = controller -> createDtoResponse(Status::CODE_200, result);
 response->putHeader("Access-Control-Allow-Origin", "*");
-__ControllerType::Test();
 return _return(response);
 }
 }
