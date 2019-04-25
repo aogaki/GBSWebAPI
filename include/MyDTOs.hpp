@@ -39,6 +39,17 @@ class FluxDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, time);
 };
 
+class TestDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(TestDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, mean);
+  DTO_FIELD(String, fwhm);
+  DTO_FIELD(String, imagePath);
+  DTO_FIELD(String, time);
+};
+
 class EnergyDto : public oatpp::data::mapping::type::Object
 {
   DTO_INIT(EnergyDto, Object)
@@ -46,8 +57,35 @@ class EnergyDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, id);
   DTO_FIELD(String, mean);
   DTO_FIELD(String, fwhm);
-  DTO_FIELD(String, imagePath);
   DTO_FIELD(String, time);
+  DTO_FIELD(String, fit);
+};
+
+class PositionDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(PositionDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, img2D);
+  DTO_FIELD(String, imgH);
+  DTO_FIELD(String, imgV);
+  DTO_FIELD(String, comment2D);
+  DTO_FIELD(String, commentH);
+  DTO_FIELD(String, commentV);
+  DTO_FIELD(String, commentAll);
+};
+
+class ExpLogDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(ExpLogDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, expName);
+  DTO_FIELD(String, comment);
+  DTO_FIELD(String, contactPerson);
+  DTO_FIELD(String, dateEnd);
+  DTO_FIELD(String, dateStart);
+  DTO_FIELD(String, mailAddress);
 };
 
 #include OATPP_CODEGEN_END(DTO)
