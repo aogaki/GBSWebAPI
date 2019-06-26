@@ -88,6 +88,20 @@ class ExpLogDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, mailAddress);
 };
 
+class FluxParDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(FluxParDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, polarity);
+  DTO_FIELD(String, DCOffset);
+  DTO_FIELD(String, threshold);
+  DTO_FIELD(String, start);
+  DTO_FIELD(String, end);
+  DTO_FIELD(String, ch);
+  DTO_FIELD(String, timeInterval);
+};
+
 #include OATPP_CODEGEN_END(DTO)
 
 #endif /* MyDTOs_hpp */

@@ -64,9 +64,9 @@ class MyController : public oatpp::web::server::api::ApiController
     return std::shared_ptr<MyController>(new MyController(objectMapper));
   }
 
-  /**
-   *  Begin ENDPOINTs generation ('ApiController' codegen)
-   */
+/**
+ *  Begin ENDPOINTs generation ('ApiController' codegen)
+ */
 #include OATPP_CODEGEN_BEGIN(ApiController)
 
   // test
@@ -366,10 +366,8 @@ class MyController : public oatpp::web::server::api::ApiController
 
     Action act() override
     {
-      std::cout << "hit\t act()" << std::endl;
       return request->readBodyToDtoAsync<ExpLogDto>(
-          this, &postTest::returnResponse,
-          controller->getDefaultObjectMapper());
+          this, &expLog::returnResponse, controller->getDefaultObjectMapper());
     }
 
     Action returnResponse(const ExpLogDto::ObjectWrapper &body)
@@ -392,39 +390,34 @@ class MyController : public oatpp::web::server::api::ApiController
     }
   };
 
-  ENDPOINT_INFO(postTest)
+  ENDPOINT_INFO(fluxPar)
   {
-    info->summary = "POST echo test";
-    info->addConsumes<ExpLogDto::ObjectWrapper>("application/json");
-    info->addResponse<List<ExpLogDto::ObjectWrapper>::ObjectWrapper>(
+    info->summary = "POST Parameter of Flux Monitor";
+    info->addConsumes<FluxParDto::ObjectWrapper>("application/json");
+    info->addResponse<List<FluxParDto::ObjectWrapper>::ObjectWrapper>(
         Status::CODE_200, "application/json");
   }
-  ENDPOINT_ASYNC("POST", "/GBS/EchoTest", postTest)
+  ENDPOINT_ASYNC("POST", "/GBS/PostFluxPar", fluxPar)
   {
-    ENDPOINT_ASYNC_INIT(postTest);
+    ENDPOINT_ASYNC_INIT(fluxPar);
 
     Action act() override
     {
-      std::cout << "hit\t act()" << std::endl;
-      return request->readBodyToDtoAsync<ExpLogDto>(
-          this, &postTest::returnResponse,
-          controller->getDefaultObjectMapper());
+      return request->readBodyToDtoAsync<FluxParDto>(
+          this, &fluxPar::returnResponse, controller->getDefaultObjectMapper());
     }
 
-    Action returnResponse(const ExpLogDto::ObjectWrapper &body)
+    Action returnResponse(const FluxParDto::ObjectWrapper &body)
     {
-      std::cout << "hit\t" << body->expName->std_str() << std::endl;
-      std::cout << request->getHeader("Origin")->std_str() << std::endl;
-
       mongocxx::client conn{mongocxx::uri{"mongodb://192.168.161.73/"}};
-      auto collection = conn["GBS"]["ExpLog"];
+      auto collection = conn["GBS"]["FluxPar"];
       bsoncxx::builder::stream::document buf{};
-      buf << "expName" << body->expName->std_str() << "comment"
-          << body->comment->std_str() << "contactPerson"
-          << body->contactPerson->std_str() << "dateEnd"
-          << body->dateEnd->std_str() << "dateStart"
-          << body->dateStart->std_str() << "mailAddress"
-          << body->mailAddress->std_str() << "time" << std::to_string(time(0));
+      buf << "polarity" << body->polarity->std_str() << "DCOffset"
+          << body->DCOffset->std_str() << "threshold"
+          << body->threshold->std_str() << "start" << body->start->std_str()
+          << "end" << body->end->std_str() << "ch" << body->ch->std_str()
+          << "timeInterval" << body->timeInterval->std_str() << "time"
+          << std::to_string(time(0));
       collection.insert_one(buf.view());
       buf.clear();
 
@@ -433,6 +426,7 @@ class MyController : public oatpp::web::server::api::ApiController
       return _return(response);
     }
   };
+
 /**
  *  Finish ENDPOINTs generation ('ApiController' codegen)
  */
