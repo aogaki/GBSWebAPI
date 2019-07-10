@@ -102,6 +102,22 @@ class FluxParDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, timeInterval);
 };
 
+class PolMeterParDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(PolMeterParDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, polarity);
+  DTO_FIELD(String, DCOffset);
+  DTO_FIELD(String, threshold);
+  DTO_FIELD(String, timeInterval);
+  DTO_FIELD(String, inCh);
+  DTO_FIELD(String, outCh1);
+  DTO_FIELD(String, outCh2);
+  DTO_FIELD(String, beamCh);
+  DTO_FIELD(String, time);
+};
+
 #include OATPP_CODEGEN_END(DTO)
 
 #endif /* MyDTOs_hpp */
