@@ -18,14 +18,6 @@
  *  Data Transfer Object. Object containing fields only.
  *  Used in API for serialization/deserialization and validation
  */
-class MyDto : public oatpp::data::mapping::type::Object
-{
-  DTO_INIT(MyDto, Object)
-
-  DTO_FIELD(Int32, statusCode);
-  DTO_FIELD(String, message);
-};
-
 class EnergyDto : public oatpp::data::mapping::type::Object
 {
   DTO_INIT(EnergyDto, Object)
@@ -37,6 +29,16 @@ class EnergyDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, fit);
 };
 
+class EnergyListDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(EnergyListDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, mean);
+  DTO_FIELD(String, fwhm);
+  DTO_FIELD(String, time);
+};
+
 class FluxDto : public oatpp::data::mapping::type::Object
 {
   DTO_INIT(FluxDto, Object)
@@ -45,6 +47,22 @@ class FluxDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, count);
   DTO_FIELD(String, hz);
   DTO_FIELD(String, time);
+};
+
+class CalibrationDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(CalibrationDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, time);
+  DTO_FIELD(String, system);
+  DTO_FIELD(String, detector);
+  DTO_FIELD(String, HV);
+  DTO_FIELD(String, p0);
+  DTO_FIELD(String, p1);
+  DTO_FIELD(String, RI);
+  DTO_FIELD(String, peaks);
+  DTO_FIELD(String, name);
 };
 
 class PositionDto : public oatpp::data::mapping::type::Object
@@ -59,6 +77,22 @@ class PositionDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, commentH);
   DTO_FIELD(String, commentV);
   DTO_FIELD(String, commentAll);
+};
+
+class VacMonDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(VacMonDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(String, time);
+  DTO_FIELD(String, pressure);
+};
+
+class VacMonGraphDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(VacMonGraphDto, Object)
+
+  DTO_FIELD(String, canvas);
 };
 
 #include OATPP_CODEGEN_END(DTO)

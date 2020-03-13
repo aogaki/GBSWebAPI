@@ -28,11 +28,11 @@ public:
     oatpp::swagger::DocumentInfo::Builder builder;
     
     builder
-    .setTitle("User entity service")
-    .setDescription("CRUD API Example project with swagger docs")
+    .setTitle("Web API for beam diagnosis")
+    .setDescription("Post and Get the beam information")
     .setVersion("1.0")
-    .setContactName("Ivan Ovsyanochka")
-    .setContactUrl("https://oatpp.io/")
+    .setContactName("Sohichiroh Aogaki")
+    .setContactUrl("https://github.com/aogaki")
     
     .setLicenseName("Apache License, Version 2.0")
     .setLicenseUrl("http://www.apache.org/licenses/LICENSE-2.0")

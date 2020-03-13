@@ -11,6 +11,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(libmongocxx REQUIRED)
 
+#---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{ROOTSYS}/ect/cmake")
+find_package(ROOT REQUIRED COMPONENTS RIO Net)
+include(${ROOT_USE_FILE})
+
 add_library(${project_name}-lib
         src/AppComponent.hpp
         src/SwaggerComponent.hpp
@@ -30,11 +36,12 @@ target_link_libraries(${project_name}-lib
         PUBLIC oatpp::oatpp
         PUBLIC oatpp::oatpp-swagger
         ${LIBMONGOCXX_LIBRARIES}
+        ${ROOT_LIBRARIES}
 )
 
 add_definitions(-DOATPP_SWAGGER_RES_PATH="${oatpp-swagger_INCLUDE_DIRS}/../bin/oatpp-swagger/res")
 
-target_include_directories(${project_name}-lib PUBLIC src ${LIBMONGOCXX_INCLUDE_DIRS})
+target_include_directories(${project_name}-lib PUBLIC src ${LIBMONGOCXX_INCLUDE_DIRS} ${ROOT_INCLUDE_DIR})
 
 ## add executables
 

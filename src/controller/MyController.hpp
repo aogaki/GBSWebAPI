@@ -143,6 +143,49 @@ class MyController : public oatpp::web::server::api::ApiController
     return response;
   }
 
+  ENDPOINT_INFO(postCalibration)
+  {
+    info->summary = "Post the current/last Calibration results";
+    info->addConsumes<CalibrationDto::ObjectWrapper>("application/json");
+    info->addResponse<CalibrationDto::ObjectWrapper>(Status::CODE_200,
+                                                     "application/json");
+  }
+  ADD_CORS(postCalibration)
+  ENDPOINT("POST", "/GBS/PostCalibration", postCalibration,
+           BODY_DTO(CalibrationDto::ObjectWrapper, dto))
+  {
+    auto echo = database->PostCalibration(dto);
+    auto response = createDtoResponse(Status::CODE_200, echo);
+    return response;
+  }
+
+  ENDPOINT_INFO(getVacMonList)
+  {
+    info->summary = "Get the list of VacMon information";
+    info->addResponse<List<VacMonDto::ObjectWrapper>::ObjectWrapper>(
+        Status::CODE_200, "application/json");
+  }
+  ADD_CORS(getVacMonList)
+  ENDPOINT("GET", "/ELIADE/GetVacMonList", getVacMonList)
+  {
+    auto dto = database->GetVacMonList();
+    auto response = createDtoResponse(Status::CODE_200, dto);
+    return response;
+  }
+
+  ENDPOINT_INFO(getVacMonGraph)
+  {
+    info->summary = "Get the graph of VacMon information as JSON";
+    info->addResponse<VacMonDto::ObjectWrapper>(Status::CODE_200,
+                                                "application/json");
+  }
+  ADD_CORS(getVacMonGraph)
+  ENDPOINT("GET", "/ELIADE/GetVacMonGraph", getVacMonGraph)
+  {
+    auto dto = database->GetVacMonGraph();
+    auto response = createDtoResponse(Status::CODE_200, dto);
+    return response;
+  }
 /**
  *  Finish ENDPOINTs generation ('ApiController' codegen)
  */
