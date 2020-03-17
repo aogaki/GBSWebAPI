@@ -38,7 +38,9 @@ class TDBHandler
   List<CalibrationDto::ObjectWrapper>::ObjectWrapper GetCalibrationList();
 
   List<VacMonDto::ObjectWrapper>::ObjectWrapper GetVacMonList();
-  VacMonGraphDto::ObjectWrapper GetVacMonGraph();
+  List<VacMonDto::ObjectWrapper>::ObjectWrapper GetVacMonList(long start,
+                                                              long stop);
+  VacMonGraphDto::ObjectWrapper GetVacMonGraph(long start = 0, long stop = 0);
 
  private:
   oatpp::concurrency::SpinLock fLock;

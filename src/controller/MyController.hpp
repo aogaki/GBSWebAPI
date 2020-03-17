@@ -12,6 +12,7 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
 #include <bsoncxx/json.hpp>
+#include <iostream>
 #include <memory>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
@@ -20,6 +21,7 @@
 
 #include "db/TDBHandler.hpp"
 #include "dto/DTOs.hpp"
+#include "oatpp/core/concurrency/SpinLock.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
 #include "oatpp/web/server/api/ApiController.hpp"
@@ -46,6 +48,8 @@ class MyController : public oatpp::web::server::api::ApiController
 
  private:
   OATPP_COMPONENT(std::shared_ptr<TDBHandler>, database);
+
+  oatpp::concurrency::SpinLock fMutex;
 
  public:
 /**
@@ -176,13 +180,27 @@ class MyController : public oatpp::web::server::api::ApiController
   ENDPOINT_INFO(getVacMonGraph)
   {
     info->summary = "Get the graph of VacMon information as JSON";
-    info->addResponse<VacMonDto::ObjectWrapper>(Status::CODE_200,
-                                                "application/json");
+    info->addResponse<VacMonGraphDto::ObjectWrapper>(Status::CODE_200,
+                                                     "application/json");
+
+    info->queryParams.add<String>("start").description =
+        "Start time of the graph in UNIX time, NOT JS Date::getTime()";
+    info->queryParams["start"].required = false;
+    info->queryParams.add<String>("stop").description =
+        "End time of the graph in UNIX time, NOT JS Date::getTime()";
+    info->queryParams["stop"].required = false;
   }
   ADD_CORS(getVacMonGraph)
-  ENDPOINT("GET", "/ELIADE/GetVacMonGraph", getVacMonGraph)
+  ENDPOINT("GET", "/ELIADE/GetVacMonGraph", getVacMonGraph,
+           REQUEST(std::shared_ptr<IncomingRequest>, request))
   {
-    auto dto = database->GetVacMonGraph();
+    std::lock_guard<oatpp::concurrency::SpinLock> lock(fMutex);
+    auto start = request->getQueryParameter("start", "0");
+    auto stop = request->getQueryParameter("stop", "0");
+    // fMutex.unlock();
+
+    auto dto = database->GetVacMonGraph(std::stol(start->std_str()),
+                                        std::stol(stop->std_str()));
     auto response = createDtoResponse(Status::CODE_200, dto);
     return response;
   }

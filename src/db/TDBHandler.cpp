@@ -2,6 +2,7 @@
 #include <TBufferJSON.h>
 
 #include <iostream>
+#include <utility>
 
 #include "TDBHandler.hpp"
 
@@ -203,7 +204,7 @@ List<VacMonDto::ObjectWrapper>::ObjectWrapper TDBHandler::GetVacMonList()
   auto oneDay = 24 * 60 * 60;
   auto th = currentTime - oneDay;
 
-  auto cursor = collection.find(document{} << "time" << open_document << "$gt"
+  auto cursor = collection.find(document{} << "time" << open_document << "$gte"
                                            << th << close_document << finalize);
 
   auto result = List<VacMonDto::ObjectWrapper>::createShared();
@@ -219,10 +220,42 @@ List<VacMonDto::ObjectWrapper>::ObjectWrapper TDBHandler::GetVacMonList()
   return result;
 }
 
-VacMonGraphDto::ObjectWrapper TDBHandler::GetVacMonGraph()
+List<VacMonDto::ObjectWrapper>::ObjectWrapper TDBHandler::GetVacMonList(
+    long start, long stop)
 {
-  std::lock_guard<oatpp::concurrency::SpinLock> lock(fLock);
+  auto conn = fEliadePool.acquire();
+  auto collection = (*conn)["ELIADE"]["VacMon"];
 
+  if (stop != 0 && start > stop) std::swap(start, stop);
+
+  // bsoncxx::builder::stream::document option;
+  auto option = document{} << "time" << open_document << "$gte" << start
+                           << "$lte" << stop << close_document << finalize;
+
+  if (stop == 0) {
+    option = document{} << "time" << open_document << "$gte" << start
+                        << close_document << finalize;
+  } else if (start == 0 && stop == 0) {
+    option = document{} << finalize;
+  }
+
+  auto cursor = collection.find({option});
+
+  auto result = List<VacMonDto::ObjectWrapper>::createShared();
+  for (auto doc : cursor) {
+    auto dto = VacMonDto::createShared();
+    dto->id = doc["_id"].get_oid().value.to_string().c_str();
+    dto->time = std::to_string(doc["time"].get_int64().value).c_str();
+    dto->pressure = std::to_string(doc["pressure"].get_double().value).c_str();
+
+    result->pushBack(dto);
+  }
+
+  return result;
+}
+
+VacMonGraphDto::ObjectWrapper TDBHandler::GetVacMonGraph(long start, long stop)
+{
   auto conn = fEliadePool.acquire();
   auto collection = (*conn)["ELIADE"]["VacMon"];
 
@@ -230,9 +263,21 @@ VacMonGraphDto::ObjectWrapper TDBHandler::GetVacMonGraph()
   auto oneDay = 24 * 60 * 60;
   auto th = currentTime - oneDay;
 
-  auto cursor = collection.find(document{} << "time" << open_document << "$gt"
-                                           << th << close_document << finalize);
+  if (stop != 0 && start > stop) std::swap(start, stop);
 
+  auto option = document{} << "time" << open_document << "$gte" << start
+                           << "$lte" << stop << close_document << finalize;
+  if (stop == 0) {
+    option = document{} << "time" << open_document << "$gte" << start
+                        << close_document << finalize;
+  } else if (start == 0 && stop == 0) {
+    option = document{} << finalize;
+  }
+  auto cursor = collection.find({option});
+
+  // TGraph is not thread safe
+  std::lock_guard<oatpp::concurrency::SpinLock> lock(fLock);
+  fGraph->Set(0);
   auto counter = 0;
   for (auto doc : cursor) {
     fGraph->SetPoint(counter++, doc["time"].get_int64().value,
