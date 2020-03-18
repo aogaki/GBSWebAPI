@@ -29,7 +29,7 @@ TDBHandler::TDBHandler()
   fGraph->GetXaxis()->SetTimeFormat("%H:%M");
 
   fCanvas.reset(new TCanvas("canvas", "Pressure monitor"));
-  fCanvas->SetLogy(kTRUE);
+  // fCanvas->SetLogy(kTRUE);
 }
 
 EnergyDto::ObjectWrapper TDBHandler::GetEnergy()
