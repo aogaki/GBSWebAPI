@@ -42,6 +42,10 @@ class TDBHandler
                                                               long stop);
   VacMonGraphDto::ObjectWrapper GetVacMonGraph(long start = 0, long stop = 0);
 
+  RunLogDto::ObjectWrapper GetLastRun();
+  RunLogDto::ObjectWrapper PostStartTime(RunLogDto::ObjectWrapper dto);
+  RunLogDto::ObjectWrapper PostStopTime(RunLogDto::ObjectWrapper dto);
+
  private:
   oatpp::concurrency::SpinLock fLock;
 

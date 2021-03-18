@@ -204,6 +204,54 @@ class MyController : public oatpp::web::server::api::ApiController
     auto response = createDtoResponse(Status::CODE_200, dto);
     return response;
   }
+
+  ENDPOINT_INFO(getLastRun)
+  {
+    info->summary = "Get the current/last run information";
+    info->addResponse<RunLogDto::ObjectWrapper>(Status::CODE_200,
+                                                "application/json");
+  }
+  ADD_CORS(getLastRun)
+  ENDPOINT("GET", "/ELIADE/GetLastRun", getLastRun)
+  {
+    auto dto = database->GetLastRun();
+    auto response = createDtoResponse(Status::CODE_200, dto);
+    return response;
+  }
+
+  ENDPOINT_INFO(postStasrtTime)
+  {
+    info->summary =
+        "Post start time with run number.  Creating document in the DB.";
+    info->addConsumes<RunLogDto::ObjectWrapper>("application/json");
+    info->addResponse<RunLogDto::ObjectWrapper>(Status::CODE_200,
+                                                "application/json");
+  }
+  ADD_CORS(postStasrtTime)
+  ENDPOINT("POST", "/ELIADE/PostStartTime", postStasrtTime,
+           BODY_DTO(RunLogDto::ObjectWrapper, dto))
+  {
+    auto echo = database->PostStartTime(dto);
+    auto response = createDtoResponse(Status::CODE_200, echo);
+    return response;
+  }
+
+  ENDPOINT_INFO(postStopTime)
+  {
+    info->summary = "Post stop time.  Creating or update document in the DB.";
+    info->addConsumes<RunLogDto::ObjectWrapper>("application/json");
+    info->addResponse<RunLogDto::ObjectWrapper>(Status::CODE_200,
+                                                "application/json");
+  }
+  ADD_CORS(postStopTime)
+  ENDPOINT("POST", "/ELIADE/PostStopTime", postStopTime,
+           BODY_DTO(RunLogDto::ObjectWrapper, dto))
+  {
+    auto echo = database->PostStopTime(dto);
+    auto response = createDtoResponse(Status::CODE_200, echo);
+    return response;
+  }
+
 /**
  *  Finish ENDPOINTs generation ('ApiController' codegen)
  */

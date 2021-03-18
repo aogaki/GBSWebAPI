@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(libmongocxx REQUIRED)
+find_package(libbsoncxx REQUIRED)
+include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
+include_directories(${LIBBSONCXX_INCLUDE_DIRS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})

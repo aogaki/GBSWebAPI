@@ -1,6 +1,7 @@
 #include <TAxis.h>
 #include <TBufferJSON.h>
 
+#include <bsoncxx/exception/exception.hpp>
 #include <iostream>
 #include <utility>
 
@@ -292,4 +293,72 @@ VacMonGraphDto::ObjectWrapper TDBHandler::GetVacMonGraph(long start, long stop)
   result->canvas = grJSON;
 
   return result;
+}
+
+RunLogDto::ObjectWrapper TDBHandler::GetLastRun()
+{
+  auto conn = fEliadePool.acquire();
+  auto collection = (*conn)["ELIADE"]["TestRunLog"];
+
+  auto opts = mongocxx::options::find{};
+  opts.limit(1);
+  auto order = document{} << "start" << -1 << finalize;
+  opts.sort(order.view());
+  auto cursor = collection.find({}, opts);
+
+  auto dto = RunLogDto::createShared();
+  for (auto doc : cursor) {
+    dto->id = doc["_id"].get_oid().value.to_string().c_str();
+    dto->runNumber = doc["runNumber"].get_int32().value;
+    dto->start = doc["start"].get_int64().value;
+    dto->stop = doc["stop"].get_int64().value;
+    dto->comment = doc["comment"].get_utf8().value.to_string().c_str();
+  }
+
+  return dto;
+}
+
+RunLogDto::ObjectWrapper TDBHandler::PostStartTime(RunLogDto::ObjectWrapper dto)
+{
+  auto conn = fEliadePool.acquire();
+  auto collection = (*conn)["ELIADE"]["TestRunLog"];
+
+  bsoncxx::builder::stream::document buf{};
+  buf << "runNumber" << dto->runNumber << "start" << dto->start << "stop"
+      << dto->stop << "comment" << dto->comment->std_str();
+  auto result = collection.insert_one(buf.view());
+  dto->id = result->inserted_id().get_oid().value.to_string().c_str();
+  buf.clear();
+
+  return dto;
+}
+
+RunLogDto::ObjectWrapper TDBHandler::PostStopTime(RunLogDto::ObjectWrapper dto)
+{
+  auto conn = fEliadePool.acquire();
+  auto collection = (*conn)["ELIADE"]["TestRunLog"];
+  try {
+    // Check id
+    auto id = bsoncxx::oid(dto->id->std_str());
+    auto cursor = collection.find(document{} << "_id" << id << finalize);
+    auto nDoc = std::distance(cursor.begin(), cursor.end());
+    if (nDoc != 1) throw bsoncxx::exception();
+
+    // Update the document in DB
+    collection.update_one(document{} << "_id" << id << finalize,
+                          document{} << "$set" << open_document << "stop"
+                                     << dto->stop << close_document
+                                     << finalize);
+  } catch (bsoncxx::exception e) {  // This should be for any cases?
+    // There is no same id in the DB. or multiple(logically this is not happen)
+    // Make new document into DB
+    bsoncxx::builder::stream::document buf{};
+    buf << "runNumber" << dto->runNumber << "start" << dto->start << "stop"
+        << dto->stop << "comment" << dto->comment->std_str();
+    auto result = collection.insert_one(buf.view());
+    dto->id = result->inserted_id().get_oid().value.to_string().c_str();
+    buf.clear();
+  }
+
+  return dto;
 }

@@ -37,7 +37,7 @@ public:
     .setLicenseName("Apache License, Version 2.0")
     .setLicenseUrl("http://www.apache.org/licenses/LICENSE-2.0")
     
-    .addServer("http://localhost:8000", "server on localhost");
+    .addServer("http://172.18.4.56:8000", "temporary server");
     
     return builder.build();
     

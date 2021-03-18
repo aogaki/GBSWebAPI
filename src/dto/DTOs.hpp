@@ -95,6 +95,17 @@ class VacMonGraphDto : public oatpp::data::mapping::type::Object
   DTO_FIELD(String, canvas);
 };
 
+class RunLogDto : public oatpp::data::mapping::type::Object
+{
+  DTO_INIT(RunLogDto, Object)
+
+  DTO_FIELD(String, id);
+  DTO_FIELD(Int32, runNumber);
+  DTO_FIELD(Int64, start);
+  DTO_FIELD(Int64, stop);
+  DTO_FIELD(String, comment);
+};
+
 #include OATPP_CODEGEN_END(DTO)
 
 #endif /* DTOs_hpp */
